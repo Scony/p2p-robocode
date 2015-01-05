@@ -50,15 +50,11 @@ object Mlvl extends App {
       case Broadcast(who) => println("Broadcast(" + who + ") here: " + self.path.parent + "/" + self.path.name)
     }
   }
-  
-  
-  override def main(args: Array[String]) {
 
-    val system = ActorSystem("MySystem")
-    val drawer = system.actorOf(Props(new Drawer), name = "drawer")
-    drawer ! Ping
-    system.actorSelection("/user/drawer/clientA/robotA") ! Go
-    system.actorFor("/user/drawer/clientA/robotA") ! Go
-    
-  }
+  val system = ActorSystem("MySystem")
+  val drawer = system.actorOf(Props(new Drawer), name = "drawer")
+  drawer ! Ping
+  system.actorSelection("/user/drawer/clientA/robotA") ! Go
+  system.actorFor("/user/drawer/clientA/robotA") ! Go
+
 }
