@@ -3,6 +3,8 @@ package com.sconysoft.test.multilevel
 import akka.actor._
 import scala.swing._
 import scala.swing.event._
+import java.awt.Color
+import java.awt.Graphics2D
 
 object Mlvl extends SimpleSwingApplication {
   
@@ -11,32 +13,52 @@ object Mlvl extends SimpleSwingApplication {
   case object Go extends MyMessage
   case class Broadcast(who: String) extends MyMessage
 
+  class Canvas(label: Label) extends Panel {
+    var x = 0
+
+    override def paintComponent(g: Graphics2D) {
+      x += 1
+      label.text = "" + x
+      // Start by erasing this Canvas
+      g.clearRect(0, 0, size.width, size.height)
+      g.setColor(Color.green)
+      g.fillRect(0, 0, size.width, size.height)
+      
+      // Draw background here
+      g.setColor(Color.blue)
+      g.fillOval(0, 0, size.width, size.height)
+      }
+  }
+
   def top = new MainFrame {
-    // http://vimeo.com/13900342
-    title = "Reactive Swing App"
+    title = "p2p robocode"
+
     val button = new Button {
-      text = "Click me"
+      text = "Akka test"
     }
     val button2 = new Button {
-      text = "Akka test"
+      text = "Redraw"
     }
     val label = new Label {
       text = "No button clicks registered"
     }
-    contents = new BoxPanel(Orientation.Vertical) {
-      contents += button
-      contents += button2
-      contents += label
-      border = Swing.EmptyBorder(50, 50, 10, 30)
+    val canvas = new Canvas(label) {
+      preferredSize = new Dimension(500,500)
     }
+
+    contents = new BorderPanel {
+      layout(button) = BorderPanel.Position.West
+      layout(button2) = BorderPanel.Position.North
+      layout(label) = BorderPanel.Position.South
+      layout(canvas) = BorderPanel.Position.Center
+    }
+
     listenTo(button, button2)
-    var nClicks = 0
     reactions += {
-      case ButtonClicked(component) if component == button =>
-        nClicks += 1
-        label.text = "Number of button clicks: "+ nClicks
-      case ButtonClicked(component) if component == button2 =>
+      case ButtonClicked(c) if c == button =>
         runAkka
+      case ButtonClicked(c) if c == button2 =>
+        canvas.repaint()
     }
   }
   
@@ -83,6 +105,7 @@ object Mlvl extends SimpleSwingApplication {
   }
 
   def runAkka = {
+    Thread.sleep(1000);
     val system = ActorSystem("MySystem")
     val drawer = system.actorOf(Props(new Drawer), name = "drawer")
     drawer ! Ping
