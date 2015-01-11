@@ -94,11 +94,16 @@ object Mlvl extends SimpleSwingApplication {
 
     val clients = List(context.actorOf(Props(new Client), name = "clientA"),context.actorOf(Props(new Client), name = "clientB"))
 
+    def endless() {
+      while(true) {}
+    }
+
     def receive = {
       case Ping => {
         println("drawer here: " + self.path.name)
         for (client <- clients)
           client ! Ping
+        endless()
       }
       case Broadcast(who) => println("Broadcast(" + who + ") here: " + self.path.parent + "/" + self.path.name)
     }
@@ -111,6 +116,7 @@ object Mlvl extends SimpleSwingApplication {
     drawer ! Ping
     system.actorSelection("/user/drawer/clientA/robotA") ! Go
     system.actorFor("/user/drawer/clientA/robotA") ! Go
+    drawer ! Broadcast("xxx")
   }
 
 }
