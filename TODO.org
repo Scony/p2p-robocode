@@ -4,8 +4,10 @@
    should work like here: https://github.com/alvinj/AkkaKillTheCharactersGame
 ** DONE prepare build.sbt
 
-* TODO robocode [0%]
-** TODO [#A] Check what kind of broadcast we need
+* TODO robocode [33%]
+** DONE [#A] Check what kind of broadcast we need
 ** TODO Make drawer actor that will be able to update GUI
-** TODO Make initial structure
+** DONE Make initial structure
 ** TODO Check how to draw sprite using Swing
+** TODO Lock clique
+** TODO Make consistent decision about map
