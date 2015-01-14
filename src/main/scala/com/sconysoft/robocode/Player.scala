@@ -20,8 +20,9 @@ class Player extends Actor {
 
   def tryPass {
     if (barrierIn == nMembers && barrierOut == nMembers) {
-      println(me + " reached barrier")
-      context.become(playing)
+      println(me + " reached barrier... agreeing now")
+      context.become(agreeing)
+      // TODO: start consensus here
     }
   }
   
@@ -46,7 +47,7 @@ class Player extends Actor {
     }
   }
 
-  def playing: Receive = {
+  def agreeing: Receive = {
     case MemberUp(member) => {
       println("Member is Up: " + member.address)
       context.actorSelection(RootActorPath(member.address) + "/user/player") ! "Too late buddy"
