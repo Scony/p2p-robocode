@@ -9,22 +9,43 @@ class Robot extends Actor {
   val myPath = self.path
   val myFullPath = cluster.selfAddress + "/user/player/" + self.path.name
 
-  var x: Int = _
+  // exploring
+  var players: Set[String] = Set()
+  var robots: Set[String] = Set()
 
-  println("hold on")
+  // playing
+  // TODO
+
   Thread.sleep(3000)
-  println(myPath)
   println(myFullPath)
 
-  def receive = {
-    case Start => {
-      println("starting: " + x)
-      x += 1
-      x = 1/0
-      println("done: " + x)
+  // exploring
+
+  def exploring: Receive = {
+    case Start(players: Set[String]) => {
+      this.players = players
+      players.foreach(node => context.actorSelection(node) ! Request)
+    }
+    case Response(robots: Set[String]) => {
+      val senderPath = if (sender.path == self.path.parent) cluster.selfAddress + "/user/player" else sender.path.toString
+      players -= senderPath
+      this.robots ++= robots.map(robot => sender.path + "/" + robot)
+      if (players.isEmpty) {
+        println(myPath + " playing")
+        println(this.robots)
+        context.become(playing)
+      }
     }
 
+    case unknown => self ! unknown // postpone unknown messages
+  }
+
+  // playing
+
+  def playing: Receive = {
     case _ =>
   }
+
+  def receive = exploring
 
 }

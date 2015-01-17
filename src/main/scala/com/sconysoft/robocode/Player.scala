@@ -13,7 +13,6 @@ class Player extends Actor {
   val cluster = Cluster(context.system)
   val myPath = self.path
   val myFullPath = cluster.selfAddress + "/user/player"
-  println(myFullPath)
   val random = new scala.util.Random
 
   val nMembers = context.system.settings.config.getInt("akka.cluster.min-nr-of-members")
@@ -34,6 +33,8 @@ class Player extends Actor {
   // playing
   var robots: Set[ActorRef] = _
 
+  println(myFullPath)
+
   override def preStart(): Unit = cluster.subscribe(self, initialStateMode = InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
   override def postStop(): Unit = cluster.unsubscribe(self)
 
@@ -42,9 +43,11 @@ class Player extends Actor {
       case _ => Resume
     }
 
+  //waiting
+
   def tryPass {
     if (barrierIn == nMembers && barrierOut == nMembers) {
-      println(myPath + " reached barrier... agreeing now")
+      println("barrier reached... agreeing now")
       context.become(agreeing)
       self ! Propose
     }
@@ -72,14 +75,16 @@ class Player extends Actor {
     case _ =>
   }
 
+  // agreeing
+
   def decide(value: Int) {
     decision = value
     decided = true
     println("decided: " + decision + " " + proposals)
     robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
     context.become(playing)
-    robots.toList(0) ! Start
-    robots.toList(0) ! Start
+    val stringified = members.map(member => member.address.toString + "/user/player")
+    robots.foreach(robot => robot ! Start(stringified))
   }
 
   def tryDecide {
@@ -114,6 +119,7 @@ class Player extends Actor {
       println("Member Removed: " + member.address)
       members -= member
     }
+    case _: MemberEvent =>
 
     case msg: String => println(msg + " ||| " + sender.path)
     case Propose => {
@@ -139,8 +145,10 @@ class Player extends Actor {
       }
     }
 
-    case _ =>
+    case unknown => self ! unknown // postpone unknown messages
   }
+
+  // playing
 
   def playing: Receive = {
     case MemberUp(member) => {
@@ -154,6 +162,7 @@ class Player extends Actor {
     }
 
     case msg: String => println(msg + " ||| " + sender.path)
+    case Request => sender ! Response(robots.map(robot => robot.path.name))
 
     case _ =>
   }

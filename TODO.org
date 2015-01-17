@@ -1,13 +1,18 @@
-* TODO sbt [50%]
-** TODO sbt-assembly
-   https://github.com/sbt/sbt-assembly
-   should work like here: https://github.com/alvinj/AkkaKillTheCharactersGame
+* TODO sbt [100%]
 ** DONE prepare build.sbt
-
-* TODO robocode [33%]
+* TODO config [50%]
+** DONE make config
+** TODO test own config
+* TODO robocode [50%]
 ** DONE [#A] Check what kind of broadcast we need
 ** TODO Make drawer actor that will be able to update GUI
 ** DONE Make initial structure
 ** TODO Check how to draw sprite using Swing
-** TODO Lock clique
-** TODO Make consistent decision about map
+** DONE Lock clique
+** DONE Make consistent decision about map
+** DONE Start robots
+** DONE init robots
+** TODO robots ABcast
+** TODO robots inheritance
+** TODO random robot algorithm
+** TODO order handling
