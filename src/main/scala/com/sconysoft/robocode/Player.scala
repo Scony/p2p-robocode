@@ -3,7 +3,10 @@ package com.sconysoft.robocode
 import akka.cluster._
 import akka.cluster.ClusterEvent._
 import akka.actor._
+import akka.actor.SupervisorStrategy._
+import scala.concurrent.duration._
 import scala.util.Random
+import scala.language.postfixOps
 
 class Player extends Actor {
   
@@ -16,9 +19,11 @@ class Player extends Actor {
   val nMembers = context.system.settings.config.getInt("akka.cluster.min-nr-of-members")
   var members: Set[Member] = Set()
 
+  // waiting
   var barrierIn = 0
   var barrierOut = 0
 
+  // agreeing
   var proposals: Set[Int] = Set()
   var round = 0
   var decided = false
@@ -26,8 +31,16 @@ class Player extends Actor {
   var correctThisRound: Set[String] = Set()
   var correctLastRound: Set[String] = Set()
 
+  // playing
+  var robots: Set[ActorRef] = _
+
   override def preStart(): Unit = cluster.subscribe(self, initialStateMode = InitialStateAsEvents, classOf[MemberEvent], classOf[UnreachableMember])
   override def postStop(): Unit = cluster.unsubscribe(self)
+
+  override val supervisorStrategy =
+    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      case _ => Resume
+    }
 
   def tryPass {
     if (barrierIn == nMembers && barrierOut == nMembers) {
@@ -59,6 +72,16 @@ class Player extends Actor {
     case _ =>
   }
 
+  def decide(value: Int) {
+    decision = value
+    decided = true
+    println("decided: " + decision + " " + proposals)
+    robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
+    context.become(playing)
+    robots.toList(0) ! Start
+    robots.toList(0) ! Start
+  }
+
   def tryDecide {
     val correct = members.map(member => {
       val path = RootActorPath(member.address) + "user/player"
@@ -69,9 +92,7 @@ class Player extends Actor {
     })
     if (correct.subsetOf(correctThisRound) && !decided) {
       if (correctThisRound == correctLastRound) {
-        decision = proposals.min
-        decided = true
-        println("decided: " + decision + " " + proposals)
+        decide(proposals.min)
         members.foreach(member => context.actorSelection(RootActorPath(member.address) + "user/player") ! Decided(decision,round))
       } else {
         round += 1
@@ -113,12 +134,26 @@ class Player extends Actor {
     }
     case Decided(value: Int, round: Int) => {
       if (!decided) {
-        decision = value
-        decided = true
-        println("decided: " + decision + " " + proposals)
+        decide(value)
         members.foreach(member => context.actorSelection(RootActorPath(member.address) + "user/player") ! Decided(decision,round+1))
       }
     }
+
+    case _ =>
+  }
+
+  def playing: Receive = {
+    case MemberUp(member) => {
+      println("Member is Up: " + member.address)
+      context.actorSelection(RootActorPath(member.address) + "user/player") ! "Too late buddy"
+    }
+    case UnreachableMember(member) => println("Member is Unreachable: " + member.address)
+    case MemberRemoved(member, previousStatus) => { // TODO
+      println("Member Removed: " + member.address)
+      members -= member
+    }
+
+    case msg: String => println(msg + " ||| " + sender.path)
 
     case _ =>
   }

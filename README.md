@@ -1,4 +1,4 @@
 p2p-robocode
 ============
 
-Tank battle arena
+Robot battle arena
