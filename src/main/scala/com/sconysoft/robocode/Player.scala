@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import scala.util.Random
 import scala.language.postfixOps
 
-class Player extends Actor {
+class Player extends Actor with Stash{
   
   val cluster = Cluster(context.system)
   val myPath = self.path
@@ -42,6 +42,12 @@ class Player extends Actor {
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
       case _ => Resume
     }
+
+  def startRobots {
+    robots.foreach(robot => context.stop(robot))
+    // robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
+    robots = Set(context.actorOf(Props[Robot], name = "robot1"))
+  }
 
   //waiting
 
@@ -81,8 +87,9 @@ class Player extends Actor {
     decision = value
     decided = true
     println("decided: " + decision + " " + proposals)
-    robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
+    startRobots
     context.become(playing)
+    unstashAll()
     val stringified = members.map(member => member.address.toString + "/user/player")
     robots.foreach(robot => robot ! Start(stringified))
   }
@@ -145,7 +152,7 @@ class Player extends Actor {
       }
     }
 
-    case unknown => self ! unknown // postpone unknown messages
+    case _ => stash // postpone unknown messages
   }
 
   // playing
@@ -156,9 +163,11 @@ class Player extends Actor {
       context.actorSelection(RootActorPath(member.address) + "user/player") ! "Too late buddy"
     }
     case UnreachableMember(member) => println("Member is Unreachable: " + member.address)
-    case MemberRemoved(member, previousStatus) => { // TODO
+    case MemberRemoved(member, previousStatus) => {
       println("Member Removed: " + member.address)
       members -= member
+      println("restarting...")
+      startRobots
     }
 
     case msg: String => println(msg + " ||| " + sender.path)

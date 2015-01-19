@@ -10,3 +10,6 @@ case object Request
 // robots
 case class Start(players: Set[String])
 case class Response(robots: Set[String])
+case object Move
+case class Bcast(message: String, seq: Int)
+case class ABcast(message: String, from: String)
