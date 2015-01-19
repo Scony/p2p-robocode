@@ -1,9 +1,9 @@
-* TODO sbt [100%]
+* DONE sbt [100%]
 ** DONE prepare build.sbt
 * TODO config [50%]
 ** DONE make config
 ** TODO test own config
-* TODO robocode [50%]
+* TODO robocode [66%]
 ** DONE [#A] Check what kind of broadcast we need
 ** TODO Make drawer actor that will be able to update GUI
 ** DONE Make initial structure
@@ -12,7 +12,23 @@
 ** DONE Make consistent decision about map
 ** DONE Start robots
 ** DONE init robots
-** TODO robots ABcast
-** TODO robots inheritance
+** DONE robots ABcast
+** DONE robots inheritance
 ** TODO random robot algorithm
 ** TODO order handling
+* TODO Bugfixes [0%]
+** TODO One man consensus
+   Member is Up: akka.tcp://ClusterSystem@127.0.0.1:2551
+   Member is Up: akka.tcp://ClusterSystem@127.0.0.1:57211
+   Hi there ||| akka://ClusterSystem/user/player
+   Hi there ||| akka.tcp://ClusterSystem@127.0.0.1:57211/user/player
+   barrier reached... agreeing now
+   decided: 47 Set(47)
+   ===============
+   Hi there ||| akka.tcp://ClusterSystem@127.0.0.1:2551/user/player
+   Member is Up: akka.tcp://ClusterSystem@127.0.0.1:2551
+   Member is Up: akka.tcp://ClusterSystem@127.0.0.1:57211
+   Hi there ||| akka://ClusterSystem/user/player
+   barrier reached... agreeing now
+   decided: 47 Set(47)
+** TODO Check stashing in Player

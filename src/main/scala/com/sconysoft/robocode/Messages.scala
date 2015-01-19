@@ -8,7 +8,7 @@ case class Decided(value: Int, round: Int)
 case object Request
 
 // robots
-case class Start(players: Set[String])
+case class Start(players: Set[String], mapSize: Int)
 case class Response(robots: Set[String])
 case object Move
 case class Bcast(message: String, seq: Int)

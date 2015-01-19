@@ -31,7 +31,7 @@ class Player extends Actor with Stash{
   var correctLastRound: Set[String] = Set()
 
   // playing
-  var robots: Set[ActorRef] = _
+  var robots: Set[ActorRef] = Set()
 
   println(myFullPath)
 
@@ -46,7 +46,7 @@ class Player extends Actor with Stash{
   def startRobots {
     robots.foreach(robot => context.stop(robot))
     // robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
-    robots = Set(context.actorOf(Props[Robot], name = "robot1"))
+    robots = Set(context.actorOf(Props(new Robot(new TestStrategy)), name = "robot1"))
   }
 
   //waiting
@@ -91,7 +91,7 @@ class Player extends Actor with Stash{
     context.become(playing)
     unstashAll()
     val stringified = members.map(member => member.address.toString + "/user/player")
-    robots.foreach(robot => robot ! Start(stringified))
+    robots.foreach(robot => robot ! Start(stringified,decision))
   }
 
   def tryDecide {
