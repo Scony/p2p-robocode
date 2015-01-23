@@ -16,8 +16,8 @@
 ** DONE robots inheritance
 ** TODO random robot algorithm
 ** TODO order handling
-* TODO Bugfixes [0%]
-** TODO One man consensus
+* TODO Bugfixes [100%]
+** DONE One man consensus
    Member is Up: akka.tcp://ClusterSystem@127.0.0.1:2551
    Member is Up: akka.tcp://ClusterSystem@127.0.0.1:57211
    Hi there ||| akka://ClusterSystem/user/player
@@ -31,4 +31,4 @@
    Hi there ||| akka://ClusterSystem/user/player
    barrier reached... agreeing now
    decided: 47 Set(47)
-** TODO Check stashing in Player
+** DONE Check stashing in Player
