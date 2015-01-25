@@ -55,6 +55,7 @@ class Player extends Actor with Stash{
     if (barrierIn == nMembers && barrierOut == nMembers) {
       println("barrier reached... agreeing now")
       context.become(agreeing)
+      unstashAll
       self ! Propose
     }
   }
@@ -78,7 +79,7 @@ class Player extends Actor with Stash{
       tryPass
     }
 
-    case _ =>
+    case _ => stash // postpone unknown messages
   }
 
   // agreeing
@@ -89,7 +90,7 @@ class Player extends Actor with Stash{
     println("decided: " + decision + " " + proposals)
     startRobots
     context.become(playing)
-    unstashAll()
+    unstashAll
     val stringified = members.map(member => member.address.toString + "/user/player")
     robots.foreach(robot => robot ! Start(stringified,decision))
   }
@@ -126,7 +127,6 @@ class Player extends Actor with Stash{
       println("Member Removed: " + member.address)
       members -= member
     }
-    case _: MemberEvent =>
 
     case msg: String => println(msg + " ||| " + sender.path)
     case Propose => {
