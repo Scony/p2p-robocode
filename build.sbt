@@ -8,3 +8,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.8", 
   "com.typesafe.akka" %% "akka-cluster" % "2.3.8"
 )
+
+libraryDependencies += "org.scala-lang" % "scala-swing" % "2.10+"

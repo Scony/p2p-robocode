@@ -14,5 +14,4 @@ object Main {
     val system = ActorSystem("ClusterSystem", config)
     system.actorOf(Props[Player], name = "player")
   }
-
 }

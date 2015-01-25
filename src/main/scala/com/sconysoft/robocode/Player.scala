@@ -46,7 +46,7 @@ class Player extends Actor with Stash{
   def startRobots {
     robots.foreach(robot => context.stop(robot))
     // robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
-    robots = Set(context.actorOf(Props(new Robot(new TestStrategy)), name = "robot1"))
+    robots = Set(context.actorOf(Props(new Robot(new TestStrategy())), name = "robot1"))
   }
 
   //waiting
@@ -137,7 +137,7 @@ class Player extends Actor with Stash{
         else
           path
       })
-      proposals += random.nextInt(61) + 40
+      proposals += random.nextInt(20) + 10
       members.foreach(member => context.actorSelection(RootActorPath(member.address) + "user/player") ! Proposed(proposals,round))
     }
     case Proposed(values: Set[Int], round: Int) => {
