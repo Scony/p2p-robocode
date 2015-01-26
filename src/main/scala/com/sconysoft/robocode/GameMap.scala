@@ -88,8 +88,8 @@ class GameMap (size: Int) {
   def initializeGraphics () = {
     objects.foreach(e => e.draw(panel))
 
-    frame.revalidate()
-    frame.getContentPane.revalidate()
+    // frame.revalidate()
+    // frame.getContentPane.revalidate()
     panel.revalidate()
 
     panel.repaint()
