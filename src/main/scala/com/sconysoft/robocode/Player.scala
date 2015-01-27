@@ -27,6 +27,7 @@ class Player extends Actor with Stash{
   var round = 0
   var decided = false
   var decision: Int = _
+  var proposedValue: Int = _
   var correctThisRound: Set[String] = Set()
   var correctLastRound: Set[String] = Set()
 
@@ -46,7 +47,11 @@ class Player extends Actor with Stash{
   def startRobots {
     robots.foreach(robot => context.stop(robot))
     // robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
-    robots = Set(context.actorOf(Props(new Robot(new DummyStrategy())), name = "robot1"))
+
+    if (decision.equals(proposedValue))
+      robots = Set(context.actorOf(Props(new Robot(new OffensiveStrategy())), name = "robot1"))
+    else
+      robots = Set(context.actorOf(Props(new Robot(new DummyStrategy())), name = "robot1"))
   }
 
   //waiting
@@ -137,7 +142,8 @@ class Player extends Actor with Stash{
         else
           path
       })
-      proposals += random.nextInt(20) + 10
+      proposedValue = random.nextInt(20) + 10
+      proposals += proposedValue
       members.foreach(member => context.actorSelection(RootActorPath(member.address) + "user/player") ! Proposed(proposals,round))
     }
     case Proposed(values: Set[Int], round: Int) => {

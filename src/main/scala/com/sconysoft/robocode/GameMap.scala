@@ -47,11 +47,43 @@ class GameMap (size: Int) {
   }
 
   def isValid (position: Position): Boolean = {
+    if (position.x > mapSize - 1 || position.y > mapSize - 1)
+      return false
+
     return objects(position.y * mapSize + position.x).fieldType.equals(MapObjectType.Grass)
   }
 
   def isAlive (position: Position): Boolean = {
     return objects(position.y * mapSize + position.x).fieldType.equals(MapObjectType.Ghost)
+  }
+
+  def isInDanger (position: Position): Boolean = {
+    val x = position.x
+    val y = position.y
+
+    if (((y + 1) < mapSize && x < mapSize) && objects((y + 1) * mapSize + x).fieldType.equals(MapObjectType.Bomb))
+      return true
+
+    if (((y - 1) < mapSize && x < mapSize) && objects((y - 1) * mapSize + x).fieldType.equals(MapObjectType.Bomb))
+      return true
+
+    if ((y < mapSize && (x + 1) < mapSize) && objects(y * mapSize + (x + 1)).fieldType.equals(MapObjectType.Bomb))
+      return true
+
+    if ((y < mapSize && (x - 1) < mapSize) && objects(y * mapSize + (x + 1)).fieldType.equals(MapObjectType.Bomb))
+      return true
+
+    return false
+  }
+
+  def getOthersPosition (position: Position): ArrayBuffer[Position] = {
+    var others: ArrayBuffer[Position] = ArrayBuffer[Position]()
+    objects.foreach(e => {
+      if (e.fieldType.equals(MapObjectType.Ghost) && (!e.position.x.equals(position.x) || !e.position.y.equals(position.y)))
+        others.append(e.position)
+    })
+
+    return others
   }
 
   def tick (): Unit = {

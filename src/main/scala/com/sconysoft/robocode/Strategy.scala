@@ -29,50 +29,55 @@ abstract class Strategy () {
 
     map = new GameMap (mapSize)
     validatedMapSize = map.getMapSize()
+
     map.initializeGraphics()
   }
 
   def update(order: String, from: String) {
-    val move = order.split(" +")
+    try {
+      val move = order.split(" +")
 
-    move(0) match {
-      case "set" => {
-        if (from != selfName) {
-          val otherPosition = new Position (move(1).toInt, move(2).toInt)
-          if (otherPosition == robotPosition && from < selfName) {
-            robotPosition = new Position(0, 0)
-          }
-          if (!forbiddenPositions.contains(new Position(move(1).toInt, move(2).toInt)))
-            forbiddenPositions.append(new Position(move(1).toInt, move(2).toInt))
-        } else {
-          if (!forbiddenPositions.contains(new Position(move(1).toInt, move(2).toInt)))
-            forbiddenPositions.append(new Position(move(1).toInt, move(2).toInt))
-        }
-      }
-      case "move" => {
-        if (from != selfName) {
-          if (map.isValid(new Position(move(3).toInt, move(4).toInt)))
-            map.move(new Position(move(1).toInt, move(2).toInt), new Position(move(3).toInt, move(4).toInt))
-        } else {
-          if (map.isValid(new Position(move(3).toInt, move(4).toInt))) {
-            map.move(robotPosition, new Position(move(3).toInt, move(4).toInt))
-            robotPosition = new Position(move(3).toInt, move(4).toInt)
+      move(0) match {
+        case "set" => {
+          if (from != selfName) {
+            val otherPosition = new Position (move(1).toInt, move(2).toInt)
+            if (otherPosition == robotPosition && from < selfName) {
+              robotPosition = new Position(0, 0)
+            }
+            if (!forbiddenPositions.contains(new Position(move(1).toInt, move(2).toInt)))
+              forbiddenPositions.append(new Position(move(1).toInt, move(2).toInt))
+          } else {
+            if (!forbiddenPositions.contains(new Position(move(1).toInt, move(2).toInt)))
+              forbiddenPositions.append(new Position(move(1).toInt, move(2).toInt))
           }
         }
-      }
-      case "bomb" => {
-        if (from != selfName) {
-          if (map.isValid(new Position(move(1).toInt, move(2).toInt)))
-            map.setBomb(new Position(move(1).toInt, move(2).toInt))
-        } else {
-          if (map.isValid(new Position(move(1).toInt, move(2).toInt))) {
-            map.setBomb(new Position(move(1).toInt, move(2).toInt))
-            bombs = bombs ::: 3 :: List()
-            bombs = bombs.filter(e => e > 0)
+        case "move" => {
+          if (from != selfName) {
+            if (map.isValid(new Position(move(3).toInt, move(4).toInt)))
+              map.move(new Position(move(1).toInt, move(2).toInt), new Position(move(3).toInt, move(4).toInt))
+          } else {
+            if (map.isValid(new Position(move(3).toInt, move(4).toInt))) {
+              map.move(robotPosition, new Position(move(3).toInt, move(4).toInt))
+              robotPosition = new Position(move(3).toInt, move(4).toInt)
+            }
           }
         }
+        case "bomb" => {
+          if (from != selfName) {
+            if (map.isValid(new Position(move(1).toInt, move(2).toInt)))
+              map.setBomb(new Position(move(1).toInt, move(2).toInt))
+          } else {
+            if (map.isValid(new Position(move(1).toInt, move(2).toInt))) {
+              map.setBomb(new Position(move(1).toInt, move(2).toInt))
+              bombs = bombs ::: 3 :: List()
+              bombs = bombs.filter(e => e > 0)
+            }
+          }
+        }
+        case _ =>
       }
-      case _ =>
+    } catch {
+      case ex: Exception => println(ex)
     }
   }
 
@@ -127,11 +132,12 @@ abstract class Strategy () {
         map.refresh()
         return generateMove
       }
+
+      map.refresh()
     } catch {
       case ex: Exception => println(ex)
     }
 
-    map.refresh()
     return "nop"
   }
 
