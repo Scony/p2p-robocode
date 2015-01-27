@@ -1,31 +1,22 @@
 package com.sconysoft.robocode
 
+import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
+
 class TestStrategy () extends Strategy {
+  def randPosition (forbiddenPositions: ArrayBuffer[Position]): Position = {
+    val positions: ArrayBuffer[Position] = new ArrayBuffer[Position]()
 
-  var seq = 0
-  var map: GameMap = _
+    for (x: Int <- 1 to validatedMapSize - 2)
+      for (y: Int <- 1 to validatedMapSize - 2)
+        if ((x % 2 != 0 || y % 2 != 0) && !forbiddenPositions.contains(new Position(x, y)))
+          positions.append(new Position(x, y))
 
-  override def init(robots: Set[String], self: String, mapSize: Int) {
-    println("init")
-    println("robots: " + robots)
-    println("self: " + self)
-    println("mapsize: " + mapSize)
+    val num = positions.size
+    var r = new Random()
 
-    map = new GameMap (mapSize)
-    map.initializeGraphics()
+    return positions(r.nextInt(num))
   }
 
-  override def update(order: String, from: String) {
-    println("update: " + order + ' ' + from)
-  }
-
-  override def move: String = {
-    Thread.sleep(4000)
-    seq += 1
-    if (seq == 3)
-      "EOF"
-    else
-      "msg" + seq
-  }
 
 }

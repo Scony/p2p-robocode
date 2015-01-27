@@ -32,28 +32,23 @@ class GameMap (size: Int) {
 
   frame.setVisible(true)
 
+  def getMapSize (): Int = {
+    return mapSize
+  }
+
   def validateMapSize(mapSize: Int): Int = {
     val minSize: Int = 9
 
     if (mapSize < minSize) minSize else if (mapSize % 2 == 0) mapSize + 1 else mapSize
   }
 
-  def updateMap (move: String, originalMap: ArrayBuffer[MapObject]): ArrayBuffer[MapObject] = {
-    // move to strategy class
-    move match {
-      case "move" => {
+  def setPlayer (position: Position): Unit = {
+    objects.update(position.y * mapSize + position.x, MapObject.getObject(MapObjectType.Ghost, new Position(position.x, position.y)))
 
-      }
-      case "setBomb" => {
+    val component = panel.getComponentAt(position.x * elementSize, position.y * elementSize)
+    panel.remove(component)
 
-      }
-      case "setPlayer" => {
-
-      }
-      case _ =>
-    }
-
-    return originalMap
+    objects(position.y * mapSize + position.x).draw(panel)
   }
 
   def generateMap (mapSize: Int): ArrayBuffer[MapObject] = {
@@ -88,6 +83,15 @@ class GameMap (size: Int) {
   def initializeGraphics () = {
     objects.foreach(e => e.draw(panel))
 
+    frame.revalidate()
+    frame.getContentPane.revalidate()
+    panel.revalidate()
+
+    panel.repaint()
+    frame.repaint()
+  }
+
+  def refresh () = {
     frame.revalidate()
     frame.getContentPane.revalidate()
     panel.revalidate()
