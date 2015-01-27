@@ -46,7 +46,7 @@ class Player extends Actor with Stash{
   def startRobots {
     robots.foreach(robot => context.stop(robot))
     // robots = Set(context.actorOf(Props[Robot], name = "robot1"),context.actorOf(Props[Robot], name = "robot2"))
-    robots = Set(context.actorOf(Props(new Robot(new TestStrategy())), name = "robot1"))
+    robots = Set(context.actorOf(Props(new Robot(new DummyStrategy())), name = "robot1"))
   }
 
   //waiting

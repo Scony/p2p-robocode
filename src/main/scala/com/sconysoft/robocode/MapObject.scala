@@ -18,6 +18,10 @@ trait MapObject {
   val width: Int = 20
   val height: Int = 20
 
+  def tick (): Boolean = {
+    return false
+  }
+
   def draw (panel: JPanel): Unit = {
     try {
       val imagePanel: ImagePanel = new ImagePanel(fileName)
@@ -71,11 +75,50 @@ object MapObject {
     override val fileName: String = "img/ghost.png"
   }
 
+  private class Explosion_up extends MapObject {
+    override val destroyable: Boolean = false
+    override val movable: Boolean = false
+    override val fieldType: MapObjectType = MapObjectType.Explosion_up
+    override val fileName: String = "img/explosion_up.png"
+  }
+
+  private class Explosion_down extends MapObject {
+    override val destroyable: Boolean = false
+    override val movable: Boolean = false
+    override val fieldType: MapObjectType = MapObjectType.Explosion_down
+    override val fileName: String = "img/explosion_down.png"
+  }
+  private class Explosion_left extends MapObject {
+    override val destroyable: Boolean = false
+    override val movable: Boolean = false
+    override val fieldType: MapObjectType = MapObjectType.Explosion_left
+    override val fileName: String = "img/explosion_left.png"
+  }
+  private class Explosion_right extends MapObject {
+    override val destroyable: Boolean = false
+    override val movable: Boolean = false
+    override val fieldType: MapObjectType = MapObjectType.Explosion_right
+    override val fileName: String = "img/explosion_right.png"
+  }
+  private class Explosion_middle extends MapObject {
+    override val destroyable: Boolean = false
+    override val movable: Boolean = false
+    override val fieldType: MapObjectType = MapObjectType.Explosion_middle
+    override val fileName: String = "img/explosion_center.png"
+  }
+
   private class Bomb extends MapObject {
     override val destroyable: Boolean = false
     override val movable: Boolean = false
     override val fieldType: MapObjectType = MapObjectType.Bomb
     override val fileName: String = "img/bomb.png"
+    var count: Int = 3
+
+    override def tick (): Boolean = {
+      count = count - 1
+
+      return count.equals(0)
+    }
   }
 
   private class Grass extends MapObject {
@@ -112,6 +155,31 @@ object MapObject {
         grass.init(position)
         return grass
       }
+      case MapObjectType.Explosion_down => {
+        val explosion = new Explosion_down
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_up => {
+        val explosion = new Explosion_up
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_left => {
+        val explosion = new Explosion_left
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_right => {
+        val explosion = new Explosion_right
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_middle => {
+        val explosion = new Explosion_middle
+        explosion.init(position)
+        return explosion
+      }
     }
   }
 
@@ -141,6 +209,31 @@ object MapObject {
         val grass = new Grass
         grass.init(position)
         return grass
+      }
+      case MapObjectType.Explosion_down => {
+        val explosion = new Explosion_down
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_up => {
+        val explosion = new Explosion_up
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_left => {
+        val explosion = new Explosion_left
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_right => {
+        val explosion = new Explosion_right
+        explosion.init(position)
+        return explosion
+      }
+      case MapObjectType.Explosion_middle => {
+        val explosion = new Explosion_middle
+        explosion.init(position)
+        return explosion
       }
     }
   }
